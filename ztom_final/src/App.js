@@ -64,7 +64,7 @@ class App extends Component {
   }
   calculatefacelocation = (data) => {
     
-    const datajson = JSON.parse(data);
+    const datajson = data//JSON.parse(data); parse it when not using gRPC.
     const clarifaiFace = datajson.outputs[0].data.regions[0].region_info.bounding_box
     
     const image = document.getElementById('inputimg')
@@ -91,37 +91,15 @@ class App extends Component {
 
   onbuttonsubmit = () => {
     this.setState({imageurl: this.state.input})
-
-    const raw = JSON.stringify({
-      "user_app_id": {
-            "user_id": "user id",
-            "app_id": "app id"
-        },
-      "inputs": [
-        {
-          "data": {
-            "image": {
-              "url": this.state.input
-            }
-          }
-        }
-      ]
-    });
-    const requestOptions = {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Key your api key testing change asd'
-      },
-      body: raw
-    };
-    // NOTE: MODEL_VERSION_ID is optional, you can also call prediction with the MODEL_ID only
-    // https://api.clarifai.com/v2/models/{YOUR_MODEL_ID}/outputs
-    // this will default to the latest version_id
-
-    fetch("https://api.clarifai.com/v2/models/f76196b43bbd45c99b4f3cd8e8b40a8a/outputs", requestOptions)
-      .then(response => response.text())
-      
+    fetch('http://localhost:3001/imageurl',{
+      method:'post',
+      headers:{'Content-Type': 'application/json'},
+      body:JSON.stringify({
+        input:this.state.input
+    })
+  })
+    .then(result => result.json())
+    //had frontend calling api upto here
       //.then(result => console.log(JSON.parse(result, null, 2).outputs[0].data.regions[0].region_info.bounding_box))
       .then(result => {
         if (result){
